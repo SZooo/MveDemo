@@ -1,0 +1,4 @@
+<resources>
+    <string name="app_name">MveDemo</string>
+    <string name="refresh">下拉刷新</string>
+</resources>
