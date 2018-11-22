@@ -37,11 +37,11 @@ public class MvpActivity extends AppCompatActivity implements ITaskContract.View
                 if (presenter != null) {
                     presenter.loadData();
                 }
-
             }
         });
         netModle = new NetModle();
-        new MyPresenter(netModle, this);
+        TasksRepository repository = new TasksRepository(netModle);
+        new MyPresenter(this, repository);
         response = new NetResponse();
         adapter = new DataAdapter(response, this);
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);
@@ -77,6 +77,8 @@ public class MvpActivity extends AppCompatActivity implements ITaskContract.View
 
     @Override
     public void showError(String errorMsg) {
-
+        if (swipeRefreshLayout.isRefreshing()) {
+            swipeRefreshLayout.setRefreshing(false);
+        }
     }
 }

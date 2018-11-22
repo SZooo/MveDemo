@@ -1,54 +1,37 @@
 package com.example.mvpdemo.mvedemo;
 
-import android.os.AsyncTask;
-import android.os.Handler;
-
-import java.io.IOException;
+import android.support.annotation.NonNull;
+import android.text.TextUtils;
 
 public class MyPresenter implements ITaskContract.Presenter {
 
-    NetModle netModle;
-    ITaskContract.View view;
-    Handler handler;
+    private ITaskContract.View view;
+    private TasksRepository repository;
 
-    public MyPresenter(NetModle netModle, ITaskContract.View view) {
-        if (netModle != null) {
-            this.netModle = netModle;
-        }
-        if (view != null) {
-            this.view = view;
-        }
+    public MyPresenter(@NonNull ITaskContract.View view, @NonNull TasksRepository repository) {
+        this.view = view;
+        this.repository = repository;
         this.view.setPresenter(this);
     }
+
 
     @Override
     public void loadData() {
         load();
     }
 
-
     private void load() {
-        new SubAsyncTask().execute();
-    }
-
-    class SubAsyncTask extends AsyncTask<Void, Void, String>
-    {
-        @Override
-        protected String doInBackground(Void... voids) {
-            String apiStr = null;
-            try {
-                apiStr = netModle.getApi();
-            } catch (IOException e) {
-                e.printStackTrace();
+        repository.getTasks(new IModle.LoadTasksCallback() {
+            @Override
+            public void onTasksLoaded(String dataStr) {
+                if (TextUtils.isEmpty(dataStr)) view.showError("");
+                else view.showGetData(dataStr);
             }
-            return apiStr;
-        }
 
-        @Override
-        protected void onPostExecute(String s) {
-            view.showGetData(s);
-        }
+            @Override
+            public void onDataNotAvailable() {
+                view.showError("");
+            }
+        });
     }
-
-
 }
